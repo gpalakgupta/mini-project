@@ -1,4 +1,4 @@
-import mongoose, { trusted } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
@@ -15,14 +15,14 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    roel:{
+    role:{
         type:String,
-        enum:["Doctor","Patient","Admin"],
-        default:"Patient"
+        enum:["DOCTOR","PATIENT","ADMIN"],
+        default:"PATIENT"
     }
 },{timestamps:true});
 
-// 🔑 Password hashing middleware
+// pre middleware for password hashing
 userSchema.pre("save", async function(next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
