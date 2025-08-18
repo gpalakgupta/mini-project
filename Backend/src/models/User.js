@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
         enum:["DOCTOR","PATIENT","ADMIN"],
         default:"PATIENT"
     }
+    ,
 },{timestamps:true});
 
 // pre middleware for password hashing
