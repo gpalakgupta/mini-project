@@ -48,3 +48,18 @@ export const getAllDoctorAppointments = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+// get appointment by id
+export const getAppointmentById = async (req, res) => {
+    try {
+        const appointment = await Appointment.findById(req.params.id);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+        res.status(200).json(appointment);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+};
