@@ -3,15 +3,7 @@ import mongoose from "mongoose";
 const doctorSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
+        ref: "User",
         required: true
     },
     specialization: {
@@ -22,7 +14,7 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    location:{
+    location: {
         type: String,
         required: true
     },
