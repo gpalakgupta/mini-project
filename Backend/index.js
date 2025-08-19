@@ -4,6 +4,7 @@ import cors from 'cors';
 import { connectDB } from './src/config/db.js';
 import doctorRoutes from './src/routes/doctorRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
+import appoinmentRoutes from './src/routes/appoinmentRoutes.js';
 
 
 const app = express();
@@ -20,6 +21,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/appoinment",appoinmentRoutes);
 
 
 app.get('/', (req, res) => {
