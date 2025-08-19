@@ -23,7 +23,7 @@ app.use("/api/auth", authRoutes);
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Welcome to MEDIBOT!');
 });
 
 app.listen(PORT, () => {
