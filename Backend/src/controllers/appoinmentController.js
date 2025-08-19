@@ -63,3 +63,36 @@ export const getAppointmentById = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+// update appoinment
+
+export const updateAppointment = async (req, res) => {
+    try {
+        const { doctorId, patientId, date, time } = req.body;
+        if (!doctorId || !patientId || !date || !time) {
+            return res.status(400).json({ message: "Please fill all fields" });
+        }
+
+        const appointment = await Appointment.findById(req.params.id);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        // Check if the user is authorized to update the appointment
+        if (req.user.role === "PATIENT" && req.user._id !== appointment.patient.toString()) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        appointment.doctor = doctorId;
+        appointment.patient = patientId;
+        appointment.date = date;
+        appointment.time = time;
+
+        await appointment.save();
+        res.status(200).json(appointment);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+};
