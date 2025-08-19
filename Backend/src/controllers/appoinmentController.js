@@ -96,3 +96,26 @@ export const updateAppointment = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+
+// delete appoinment
+export const deleteAppointment = async (req, res) => {
+    try {
+        const appointment = await Appointment.findById(req.params.id);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        // Check if the user is authorized to delete the appointment
+        if (req.user.role === "PATIENT" && req.user._id !== appointment.patient.toString()) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        await appointment.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: "Appointment deleted successfully" });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+};
