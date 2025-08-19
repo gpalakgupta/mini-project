@@ -25,3 +25,26 @@ export const createAppointment = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 }
+
+// get all appointments of a patient
+export const getAllAppointments = async (req, res) => {
+    try {
+        const appointments = await Appointment.find({ patient: req.user._id });
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+// get all appointments of a doctor
+export const getAllDoctorAppointments = async (req, res) => {
+    try {
+        const appointments = await Appointment.find({ doctor: req.user._id });
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Server error" });
+    }
+};
