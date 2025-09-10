@@ -44,6 +44,7 @@ import PatientLogin from "./pages/PatientLogin";
 import DoctorLogin from "./pages/DoctorLogin";
 import PatientDashboard from "./pages/PatientDashboard";
 import MediBot from "./pages/MediBot";
+import SearchDoctor from "./components/SearchDoctor";
 
 // Navbar
 import Navbar from "./components/Navbar";
@@ -74,6 +75,9 @@ function Layout() {
 
         {/* Patient Dashboard */}
         <Route path="/patient-dashboard" element={<PatientDashboard />} />
+        
+        <Route path="/search-doctor" element={<SearchDoctor />} />
+
 
         {/* MediBot */}
         <Route path="/medibot" element={<MediBot />} />
