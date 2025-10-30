@@ -19,26 +19,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["DOCTOR", "PATIENT", "ADMIN"],
         default: "PATIENT"
-    },
-    specialization: {
-        type: String,
-        required: function () {
-            return this.role === "DOCTOR";
-        }
-    },
-    hospital: {
-        type: String,
-        required: function () {
-            return this.role === "DOCTOR";
-        }
-    },
-    location: {
-        type: String,
-        required: function () {
-            return this.role === "DOCTOR";
-        }
     }
-    ,
 }, { timestamps: true });
 
 // pre middleware for password hashing
