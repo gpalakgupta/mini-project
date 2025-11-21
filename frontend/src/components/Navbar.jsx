@@ -36,7 +36,7 @@ const Navbar = () => {
                 <Stethoscope className="w-5 h-5 text-white" />
               </div>
               <span className="ml-3 text-xl font-bold text-gray-800 hidden sm:block">
-                MediBot
+                Medi-Assist
               </span>
             </div>
           </div>
