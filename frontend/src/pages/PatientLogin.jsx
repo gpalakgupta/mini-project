@@ -1,20 +1,39 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import apiClient from "../services/apiClient";
 
 export default function PatientLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // prevent page refresh
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    // 🔹 In future, add real authentication with backend here
-    if (email && password) {
-      // If login is successful → navigate to dashboard
+    if (!email || !password) {
+      setError("Please enter email and password!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data } = await apiClient.post("/auth/login", { email, password });
+
+      if (data.role !== "PATIENT") {
+        setError("Please login with a patient account.");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
       navigate("/patient-dashboard");
-    } else {
-      alert("Please enter email and password!");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,11 +62,14 @@ export default function PatientLogin() {
           />
           <button
             type="submit"
-            className="w-full p-4 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition"
+            disabled={loading}
+            className="w-full p-4 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition disabled:opacity-60"
           >
-            Login
+            {loading ? "Logging In..." : "Login"}
           </button>
         </form>
+
+        {error && <p className="text-center text-red-500 font-semibold mt-4">{error}</p>}
 
         <p className="text-center text-gray-600 mt-6">
           Don't have an account?{" "}

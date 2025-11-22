@@ -1,90 +1,154 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Search, MapPin, Star, Clock, Phone, Calendar, Filter, User, Stethoscope, Heart, Brain, Eye, Bone } from 'lucide-react';
+import apiClient from '../services/apiClient';
 
 const SearchDoctor = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Sample doctor data
-  const doctors = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      specialty: 'Cardiologist',
-      rating: 4.8,
-      reviews: 156,
-      location: 'New York, NY',
-      experience: '15 years',
-      availability: 'Available Today',
-      phone: '+1 (555) 123-4567',
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      consultationFee: '$150',
-      languages: ['English', 'Spanish'],
-      education: 'Harvard Medical School'
-    },
-    {
-      id: 2,
-      name: 'Dr. Michael Chen',
-      specialty: 'Neurologist',
-      rating: 4.9,
-      reviews: 203,
-      location: 'Los Angeles, CA',
-      experience: '12 years',
-      availability: 'Available Tomorrow',
-      phone: '+1 (555) 987-6543',
-      image: 'https://images.pexels.com/photos/6749778/pexels-photo-6749778.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      consultationFee: '$200',
-      languages: ['English', 'Mandarin'],
-      education: 'Johns Hopkins University'
-    },
-    {
-      id: 3,
-      name: 'Dr. Emily Rodriguez',
-      specialty: 'Dermatologist',
-      rating: 4.7,
-      reviews: 89,
-      location: 'Miami, FL',
-      experience: '8 years',
-      availability: 'Available Today',
-      phone: '+1 (555) 456-7890',
-      image: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      consultationFee: '$120',
-      languages: ['English', 'Spanish', 'Portuguese'],
-      education: 'University of Miami'
-    },
-    {
-      id: 4,
-      name: 'Dr. James Wilson',
-      specialty: 'Orthopedist',
-      rating: 4.6,
-      reviews: 134,
-      location: 'Chicago, IL',
-      experience: '20 years',
-      availability: 'Available Next Week',
-      phone: '+1 (555) 321-0987',
-      image: 'https://images.pexels.com/photos/6749777/pexels-photo-6749777.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      consultationFee: '$180',
-      languages: ['English'],
-      education: 'Northwestern University'
-    },
-    {
-      id: 5,
-      name: 'Dr. Lisa Thompson',
-      specialty: 'Ophthalmologist',
-      rating: 4.9,
-      reviews: 167,
-      location: 'Seattle, WA',
-      experience: '14 years',
-      availability: 'Available Today',
-      phone: '+1 (555) 654-3210',
-      image: 'https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      consultationFee: '$160',
-      languages: ['English', 'French'],
-      education: 'University of Washington'
-    }
-  ];
+  useEffect(() => {
+    const fallbackDoctors = [
+      {
+        id: 'in-1',
+        name: 'Dr. Aisha Mehta',
+        email: 'aisha.mehta@example.com',
+        specialty: 'Cardiologist',
+        rating: 4.9,
+        reviews: 327,
+        location: 'Mumbai, Maharashtra',
+        experience: '15 years',
+        availability: 'Available Today',
+        phone: '+91 22 5555 1111',
+        consultationFee: '₹1,200',
+        languages: ['English', 'Hindi', 'Marathi'],
+        education: 'AIIMS Delhi',
+        image: 'https://images.pexels.com/photos/5452264/pexels-photo-5452264.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+      },
+      {
+        id: 'in-2',
+        name: 'Dr. Rohan Iyer',
+        email: 'rohan.iyer@example.com',
+        specialty: 'Neurologist',
+        rating: 4.8,
+        reviews: 289,
+        location: 'Bengaluru, Karnataka',
+        experience: '12 years',
+        availability: 'Available Tomorrow',
+        phone: '+91 80 5555 2222',
+        consultationFee: '₹1,500',
+        languages: ['English', 'Kannada', 'Hindi'],
+        education: 'NIMHANS Bengaluru',
+        image: 'https://images.pexels.com/photos/6627819/pexels-photo-6627819.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+      },
+      {
+        id: 'in-3',
+        name: 'Dr. Priya Nair',
+        email: 'priya.nair@example.com',
+        specialty: 'Dermatologist',
+        rating: 4.7,
+        reviews: 198,
+        location: 'Kochi, Kerala',
+        experience: '10 years',
+        availability: 'Available Today',
+        phone: '+91 484 555 3333',
+        consultationFee: '₹900',
+        languages: ['English', 'Malayalam', 'Hindi'],
+        education: 'CMC Vellore',
+        image: 'https://images.pexels.com/photos/7659557/pexels-photo-7659557.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+      },
+      {
+        id: 'in-4',
+        name: 'Dr. Arjun Singh',
+        email: 'arjun.singh@example.com',
+        specialty: 'Orthopedist',
+        rating: 4.6,
+        reviews: 250,
+        location: 'New Delhi, Delhi',
+        experience: '18 years',
+        availability: 'Available Next Week',
+        phone: '+91 11 5555 4444',
+        consultationFee: '₹1,300',
+        languages: ['English', 'Hindi', 'Punjabi'],
+        education: 'PGI Chandigarh',
+        image: 'https://images.pexels.com/photos/4586989/pexels-photo-4586989.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+      },
+      {
+        id: 'in-5',
+        name: 'Dr. Kavya Rao',
+        email: 'kavya.rao@example.com',
+        specialty: 'Pediatrician',
+        rating: 4.9,
+        reviews: 310,
+        location: 'Hyderabad, Telangana',
+        experience: '14 years',
+        availability: 'Available Today',
+        phone: '+91 40 5555 6666',
+        consultationFee: '₹1,000',
+        languages: ['English', 'Telugu', 'Hindi'],
+        education: 'Osmania Medical College',
+        image: 'https://images.pexels.com/photos/7088526/pexels-photo-7088526.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+      },
+    ];
+
+    const fetchDoctors = async () => {
+      try {
+        setLoading(true);
+        const { data } = await apiClient.get('/doctors/getalldoctors');
+        const normalizedDoctors = data.map((doctor) => ({
+          id: doctor._id,
+          name: doctor.name,
+          email: doctor.email,
+          specialty: doctor.specialization || 'General Physician',
+          rating: doctor.rating || 4.8,
+          reviews: doctor.reviews || 0,
+          location: doctor.location || 'Not provided',
+          experience: doctor.experience || '5 years',
+          availability: doctor.availability || 'Available',
+          phone: doctor.phone || 'N/A',
+          consultationFee: doctor.consultationFee
+            ? (doctor.consultationFee.toString().includes('₹') ? doctor.consultationFee : `₹${doctor.consultationFee}`)
+            : '₹1,000',
+          languages: doctor.languages?.length ? doctor.languages : ['English', 'Hindi'],
+          education: doctor.education || 'Not provided',
+          image: doctor.avatar ||
+            'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+        }));
+
+        if (!normalizedDoctors.length) {
+          setDoctors(fallbackDoctors);
+          return;
+        }
+
+        const mergedByKey = new Map();
+        const normalize = (value = '') => value.toString().trim().toLowerCase();
+        const upsertDoctor = (doc) => {
+          const key =
+            (doc.email && normalize(doc.email)) ||
+            `${normalize(doc.name)}|${normalize(doc.location)}|${normalize(doc.specialty)}`;
+          if (!mergedByKey.has(key)) {
+            mergedByKey.set(key, doc);
+          }
+        };
+
+        normalizedDoctors.forEach(upsertDoctor);
+        fallbackDoctors.forEach(upsertDoctor);
+
+        setDoctors(Array.from(mergedByKey.values()));
+      } catch (err) {
+        setError('Unable to fetch doctors at the moment. Showing recommended specialists nearby.');
+        setDoctors(fallbackDoctors);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   const specialties = [
     { name: 'Cardiologist', icon: Heart },
@@ -95,14 +159,22 @@ const SearchDoctor = () => {
     { name: 'General Physician', icon: Stethoscope }
   ];
 
-  const locations = ['New York, NY', 'Los Angeles, CA', 'Miami, FL', 'Chicago, IL', 'Seattle, WA'];
+  const locations = useMemo(() => {
+    const uniqueLocations = new Set(
+      doctors
+        .map((doctor) => doctor.location)
+        .filter(Boolean)
+    );
+    return Array.from(uniqueLocations);
+  }, [doctors]);
 
   const filteredDoctors = doctors.filter(doctor => {
-    const matchesSearch = doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
     const matchesLocation = !selectedLocation || doctor.location === selectedLocation;
-    
+
     return matchesSearch && matchesSpecialty && matchesLocation;
   });
 
@@ -231,7 +303,7 @@ const SearchDoctor = () => {
           <div className="lg:w-3/4">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                Available Doctors ({filteredDoctors.length})
+                {loading ? 'Fetching doctors...' : `Available Doctors (${filteredDoctors.length})`}
               </h2>
               <p className="text-gray-600">
                 {searchTerm && `Results for "${searchTerm}"`}
@@ -242,6 +314,12 @@ const SearchDoctor = () => {
 
             {/* Doctor Cards */}
             <div className="space-y-6">
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg">
+                  {error}
+                </div>
+              )}
+
               {filteredDoctors.map(doctor => {
                 const SpecialtyIcon = getSpecialtyIcon(doctor.specialty);
                 return (
@@ -279,7 +357,7 @@ const SearchDoctor = () => {
                                   <span>{doctor.experience}</span>
                                 </div>
                               </div>
-                              <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
+                            <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
                                 <MapPin className="w-4 h-4" />
                                 <span>{doctor.location}</span>
                               </div>
@@ -334,7 +412,7 @@ const SearchDoctor = () => {
               })}
             </div>
 
-            {filteredDoctors.length === 0 && (
+            {!loading && filteredDoctors.length === 0 && (
               <div className="text-center py-12">
                 <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <Search className="w-12 h-12 text-gray-400" />
