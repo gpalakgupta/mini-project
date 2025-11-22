@@ -72,7 +72,7 @@ const SearchDoctor = () => {
         experience: '18 years',
         availability: 'Available Next Week',
         phone: '+91 11 5555 4444',
-        consultationFee: '₹1,300',
+        consultationFee: '₹1,400',
         languages: ['English', 'Hindi', 'Punjabi'],
         education: 'PGI Chandigarh',
         image: 'https://images.pexels.com/photos/4586989/pexels-photo-4586989.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
