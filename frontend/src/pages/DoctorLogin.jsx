@@ -1,9 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import apiClient from "../services/apiClient";
+import { useAuth } from "../context/AuthContext";
 
 export default function DoctorLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,18 +22,24 @@ export default function DoctorLogin() {
 
     setLoading(true);
     try {
-      const { data } = await apiClient.post("/auth/login", { email, password });
+      const result = await login(email, password);
 
-      if (data.role !== "DOCTOR") {
+      if (!result.success) {
+        setError(result.error || "Invalid credentials. Please try again.");
+        return;
+      }
+
+      // Check if user is a doctor
+      if (result.data.role !== "DOCTOR") {
         setError("Please login with a doctor account.");
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      navigate("/search-doctor");
+      // Redirect to intended page or doctor dashboard
+      const from = location.state?.from?.pathname || "/search-doctor";
+      navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

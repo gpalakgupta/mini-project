@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import apiClient from "../services/apiClient";
+import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,21 +31,40 @@ export default function Signup() {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setStatusMessage({ type: "error", text: "Password must be at least 6 characters long." });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await apiClient.post("/auth/register", formData);
+      const result = await register(formData);
+
+      if (!result.success) {
+        setStatusMessage({
+          type: "error",
+          text: result.error || "Unable to create the account.",
+        });
+        return;
+      }
+
       setStatusMessage({
         type: "success",
-        text: "Account created! Redirecting you to login...",
+        text: "Account created successfully! Redirecting...",
       });
 
+      // Redirect based on role
       setTimeout(() => {
-        navigate(formData.role === "DOCTOR" ? "/doctor-login" : "/patient-login");
-      }, 800);
+        if (result.data.role === "DOCTOR") {
+          navigate("/search-doctor", { replace: true });
+        } else {
+          navigate("/patient-dashboard", { replace: true });
+        }
+      }, 1000);
     } catch (error) {
       setStatusMessage({
         type: "error",
-        text: error.response?.data?.message || "Unable to create the account.",
+        text: "An unexpected error occurred. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
