@@ -108,7 +108,7 @@ function Layout() {
         <Route
           path="/search-doctor"
           element={
-            <ProtectedRoute requiredRole="DOCTOR">
+            <ProtectedRoute requiredRole="PATIENT">
               <SearchDoctor />
             </ProtectedRoute>
           }
